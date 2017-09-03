@@ -28,7 +28,7 @@ class testSpec extends FreeSpec with MustMatchers {
 
     "given example x 2 gem types x 2 raw chunks" - {
       "largest profit" in {
-        test("input4.json", 27* 2 * 2)
+        test("input4.json", 27 * 2 * 2)
       }
     }
   }
