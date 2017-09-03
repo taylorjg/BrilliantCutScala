@@ -13,13 +13,8 @@ object BrilliantCut {
     gems.map(calculateMaxProfitsForRawChunks).map(_.sum).sum
   }
 
-  private def memoize[I, O](f: I => O): I => O =
-    new scala.collection.mutable.HashMap[I, O] {
-      override def apply(key: I): O = getOrElseUpdate(key, f(key))
-    }
-
   private def calculateMaxProfitsForRawChunks(gem: Gem): Seq[Int] = {
-    val memoized = memoize(calculateAllProfitsForRawChunk(gem.cuts))
+    val memoized = new Memoize(calculateAllProfitsForRawChunk(gem.cuts))
     gem.rawChunks.map(memoized).map(_.max)
   }
 
@@ -38,19 +33,21 @@ object BrilliantCut {
     profit
   }
 
-  private def generateCombinationsOfCuts(
-      chunkSize: Int,
-      availableCuts: Stream[Cut],
-      actualCuts: Seq[Cut]): Stream[Seq[Cut]] = {
+  private def generateCombinationsOfCuts(chunkSize: Int,
+                                         availableCuts: Stream[Cut],
+                                         actualCuts: Seq[Cut]): Stream[Seq[Cut]] =
     availableCuts.flatMap(availableCut => {
       val remainingChunkSize = chunkSize - availableCut.size
       if (remainingChunkSize > 0) {
-        val newActualCuts = actualCuts :+ availableCut
-        Stream.cons(newActualCuts, generateCombinationsOfCuts(remainingChunkSize, availableCuts, newActualCuts))
-      }
-      else {
+        def sortCutsBySize(a: Cut, b: Cut) = a.size == b.size
+        val newActualCuts =
+          (availableCut +: actualCuts).sortWith(sortCutsBySize)
+        newActualCuts #::
+          generateCombinationsOfCuts(remainingChunkSize,
+                                     availableCuts,
+                                     newActualCuts)
+      } else {
         Stream.empty
       }
     })
   }
-}
