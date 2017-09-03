@@ -1,19 +1,11 @@
-import io.circe.generic.auto._
-import io.circe.parser.decode
-
 import scala.io.Source
 
 object Main {
   def main(args: Array[String]): Unit = {
     val json = Source.fromResource("input.json").getLines.mkString
-    decode[Input](json) match {
-      case Right(input) =>
-        timeIt(BrilliantCut.largestProfit(input)) match {
-          case (largestProfit, elapsedTime ) =>
-            println(s"largestProfit: $largestProfit; elapsed time: ${elapsedTime}ms")
-        }
-      case Left(error) =>
-        println(s"Failed to read input.json: $error")
+    timeIt(BrilliantCut.largestProfit(json)) match {
+      case (largestProfit, elapsedTime ) =>
+        println(s"largestProfit: $largestProfit; elapsed time: ${elapsedTime}ms")
     }
   }
 

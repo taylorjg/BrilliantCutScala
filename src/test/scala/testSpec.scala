@@ -1,6 +1,6 @@
 import org.scalatest.{FreeSpec, MustMatchers}
-import io.circe.generic.auto._
-import io.circe.parser.decode
+//import io.circe.generic.auto._
+//import io.circe.parser.decode
 
 import scala.io.Source
 
@@ -35,9 +35,8 @@ class testSpec extends FreeSpec with MustMatchers {
 
   private def test(resource: String, expected: Int): Unit = {
     val json = Source.fromResource(resource).getLines.mkString
-    decode[Input](json) match {
-      case Right(input) =>
-        val actual = BrilliantCut.largestProfit(input)
+    BrilliantCut.largestProfit(json) match {
+      case Right(actual) =>
         actual mustBe expected
       case Left(error) =>
         fail(s"Failed to decode contents of $resource: $error")

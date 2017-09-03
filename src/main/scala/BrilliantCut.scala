@@ -1,4 +1,12 @@
+import io.circe.generic.auto._
+import io.circe.parser.decode
+import io.circe.Error
+
 object BrilliantCut {
+
+  def largestProfit(json: String): Either[Error, Int] = {
+    decode[Input](json).map(largestProfit)
+  }
 
   def largestProfit(input: Input): Int = {
     val gems = Seq(input.diamond, input.sapphire, input.ruby)
@@ -6,7 +14,7 @@ object BrilliantCut {
   }
 
   private def memoize[I, O](f: I => O): I => O =
-    new scala.collection.mutable.HashMap[I, O]() {
+    new scala.collection.mutable.HashMap[I, O] {
       override def apply(key: I): O = getOrElseUpdate(key, f(key))
     }
 
