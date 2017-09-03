@@ -1,0 +1,22 @@
+{
+  "diamond": {
+    "cuts": [
+      {"size": 7, "value": 7},
+      {"size": 11, "value": 14},
+      {"size": 17, "value": 25}
+    ],
+    "rawChunks": [23]
+  },
+  "sapphire": {
+    "cuts": [
+      {"size": 7, "value": 7},
+      {"size": 11, "value": 14},
+      {"size": 17, "value": 25}
+    ],
+    "rawChunks": [23]
+  },
+  "ruby": {
+    "cuts": [],
+    "rawChunks": []
+  }
+}
