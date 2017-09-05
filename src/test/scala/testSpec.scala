@@ -38,8 +38,8 @@ class testSpec extends FreeSpec with MustMatchers {
     BrilliantCut.largestProfit(json) match {
       case Right(actual) =>
         actual mustBe expected
-      case Left(error) =>
-        fail(s"Failed to decode contents of $resource: $error")
+      case Left(errors) =>
+        fail(s"Failed to decode contents of $resource: $errors")
     }
   }
 }

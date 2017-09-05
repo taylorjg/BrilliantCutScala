@@ -1,17 +1,22 @@
+import cats.data.NonEmptyList
 import io.circe.generic.auto._
 import io.circe.parser.decode
-import io.circe.Error
+import io.circe.{Errors, JsonObject}
 
 object BrilliantCut {
 
-  def largestProfit(json: String): Either[Error, Int] = {
-    decode[Input](json).map(largestProfit)
+  def largestProfit(json: String): Either[Errors, Int] = {
+    decode[JsonObject](json) match {
+      case Right(jsonObject) =>
+        // TODO: handle errors => Left(NonEmptyList[Error])
+        Right(largestProfit(jsonObject.values.flatMap(_.as[Gem].toOption)))
+      case Left(error) =>
+        Left(Errors(NonEmptyList(error, Nil)))
+    }
   }
 
-  def largestProfit(input: Input): Int = {
-    val gems = Seq(input.diamond, input.sapphire, input.ruby)
+  def largestProfit(gems: Seq[Gem]): Int =
     gems.map(calculateMaxProfitsForRawChunks).map(_.sum).sum
-  }
 
   private def calculateMaxProfitsForRawChunks(gem: Gem): Seq[Int] = {
     val memoized = new Memoize(calculateAllProfitsForRawChunk(gem.cuts))
