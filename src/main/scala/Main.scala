@@ -7,7 +7,7 @@ object Main {
       case (Right(largestProfit), elapsedTime) =>
         println(s"largestProfit: $largestProfit; elapsed time: ${elapsedTime}ms")
       case (Left(errors), elapsedTime) =>
-        println(s"FAILED: $errors; elapsed time: ${elapsedTime}ms")
+        println(s"FAILED: ${errors.toList}; elapsed time: ${elapsedTime}ms")
     }
   }
 

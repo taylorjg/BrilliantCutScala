@@ -1,4 +1,6 @@
 import cats.data.NonEmptyList
+import cats.data.Validated.{Invalid, Valid}
+import cats.implicits._
 import io.circe.generic.auto._
 import io.circe.parser.decode
 import io.circe.{Errors, JsonObject}
@@ -8,10 +10,18 @@ object BrilliantCut {
   def largestProfit(json: String): Either[Errors, Int] = {
     decode[JsonObject](json) match {
       case Right(jsonObject) =>
-        // TODO: handle errors => Left(NonEmptyList[Error])
-        Right(largestProfit(jsonObject.values.flatMap(_.as[Gem].toOption)))
+        jsonObject.values
+          .map(_.as[Gem])
+          .map(_.toValidated)
+          .map(_.bimap(List(_), List(_)))
+          .combineAll match {
+          case Valid(gems) =>
+            Right(largestProfit(gems))
+          case Invalid(errors) =>
+            Left(Errors(NonEmptyList.fromListUnsafe(errors)))
+        }
       case Left(error) =>
-        Left(Errors(NonEmptyList(error, Nil)))
+        Left(Errors(NonEmptyList.of(error)))
     }
   }
 
@@ -38,9 +48,10 @@ object BrilliantCut {
     profit
   }
 
-  private def generateCombinationsOfCuts(chunkSize: Int,
-                                         availableCuts: Stream[Cut],
-                                         actualCuts: Seq[Cut]): Stream[Seq[Cut]] =
+  private def generateCombinationsOfCuts(
+      chunkSize: Int,
+      availableCuts: Stream[Cut],
+      actualCuts: Seq[Cut]): Stream[Seq[Cut]] =
     availableCuts.flatMap(availableCut => {
       val remainingChunkSize = chunkSize - availableCut.size
       if (remainingChunkSize > 0) {
@@ -55,4 +66,4 @@ object BrilliantCut {
         Stream.empty
       }
     })
-  }
+}
