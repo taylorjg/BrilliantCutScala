@@ -1,11 +1,13 @@
 import cats.data.NonEmptyList
-import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
 import io.circe.generic.auto._
 import io.circe.parser.decode
 import io.circe.{Errors, JsonObject}
 
 object BrilliantCut {
+
+  def largestProfit(gems: Seq[Gem]): Int =
+    gems.map(calculateMaxProfitsForRawChunks).map(_.sum).sum
 
   def largestProfit(json: String): Either[Errors, Int] = {
     decode[JsonObject](json) match {
@@ -14,19 +16,14 @@ object BrilliantCut {
           .map(_.as[Gem])
           .map(_.toValidated)
           .map(_.bimap(List(_), List(_)))
-          .combineAll match {
-          case Valid(gems) =>
-            Right(largestProfit(gems))
-          case Invalid(errors) =>
-            Left(Errors(NonEmptyList.fromListUnsafe(errors)))
-        }
+          .combineAll
+          .bimap(errors => Errors(NonEmptyList.fromListUnsafe(errors)),
+                 gems => largestProfit(gems))
+          .toEither
       case Left(error) =>
         Left(Errors(NonEmptyList.of(error)))
     }
   }
-
-  def largestProfit(gems: Seq[Gem]): Int =
-    gems.map(calculateMaxProfitsForRawChunks).map(_.sum).sum
 
   private def calculateMaxProfitsForRawChunks(gem: Gem): Seq[Int] = {
     val memoized = new Memoize(calculateAllProfitsForRawChunk(gem.cuts))
