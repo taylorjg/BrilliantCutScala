@@ -26,14 +26,15 @@ object BrilliantCut {
   }
 
   private def calculateMaxProfitsForRawChunks(gem: Gem): Seq[Int] = {
-    val memoized = new Memoize(calculateAllProfitsForRawChunk(gem.cuts))
-    gem.rawChunks.map(memoized).map(_.max)
+    val memoized = new Memoize(calculateMaxProfitForRawChunk(gem.cuts))
+    gem.rawChunks.map(memoized)
   }
 
-  private def calculateAllProfitsForRawChunk(availableCuts: Seq[Cut])(
-      rawChunk: Int): Seq[Int] = {
-    generateCombinationsOfCuts(rawChunk, availableCuts.toStream, Seq.empty).distinct
+  private def calculateMaxProfitForRawChunk(availableCuts: Seq[Cut])(
+      rawChunk: Int): Int = {
+    generateCombinationsOfCuts(rawChunk, availableCuts.toStream, Seq.empty)
       .map(calculateProfitForCombinationOfCuts(rawChunk))
+      .max
   }
 
   private def calculateProfitForCombinationOfCuts(rawChunk: Int)(
