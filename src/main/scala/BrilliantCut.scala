@@ -52,10 +52,8 @@ object BrilliantCut {
       actualCuts: Seq[Cut]): Stream[Seq[Cut]] =
     availableCuts.flatMap(availableCut => {
       val remainingChunkSize = chunkSize - availableCut.size
-      if (remainingChunkSize > 0) {
-        def sortCutsBySize(a: Cut, b: Cut) = a.size == b.size
-        val newActualCuts =
-          (availableCut +: actualCuts).sortWith(sortCutsBySize)
+      if (remainingChunkSize >= 0) {
+        val newActualCuts = availableCut +: actualCuts
         newActualCuts #::
           generateCombinationsOfCuts(remainingChunkSize,
                                      availableCuts,
